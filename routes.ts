@@ -99,8 +99,3 @@ export type APIRoutes =
   | { name: "Fetch Settings", method: 'post', path: `/sync/settings/fetch`, query: never, response: MapResponses<schema.paths['/sync/settings/fetch']['post']['responses']> }
   | { name: "Set Settings", method: 'post', path: `/sync/settings/set`, query: schema.operations['set_settings_req']['parameters']['query'], response: MapResponses<schema.paths['/sync/settings/set']['post']['responses']> }
   | { name: "Fetch Unreads", method: 'get', path: `/sync/unreads`, query: never, response: MapResponses<schema.paths['/sync/unreads']['get']['responses']> }
-
-export const encodeURLQueryString = (params: Record<string, string | number | boolean>) =>
-  Object.keys(params)
-    .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
-    .join("&");

@@ -59,11 +59,6 @@ export type Route = { name: string, method: string, path: string, query: unknown
 
 export type APIRoutes =
 ${routes.join("\n")}
-
-export const encodeURLQueryString = (params: Record<string, string | number | boolean>) =>
-  Object.keys(params)
-    .map((k) => \`\${encodeURIComponent(k)}=\${encodeURIComponent(params[k])}\`)
-    .join("&");
 `.trimStart();
 
 Deno.writeTextFileSync(outPath, output);
