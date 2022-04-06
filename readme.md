@@ -6,7 +6,7 @@ $ curl https://raw.githubusercontent.com/revoltchat/api/master/OpenAPI.json > Op
 
 $ npx openapi-typescript OpenAPI.json -o schema.ts
 ✨ openapi-typescript 5.2.0
-🚀 OpenAPI.json -> D:\bree\Code\github.com\brecert\revolt-api-gen\schema.ts [417ms]
+🚀 OpenAPI.json -> /revolt-api-gen/schema.ts [417ms]
 
 $ deno run -A ./scripts/generate.ts -i OpenAPI.json -o .\routes.ts
 ```
