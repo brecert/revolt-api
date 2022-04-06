@@ -1,6 +1,6 @@
 // This file was generated with https://github.com/brecert/revolt-api-gen
 
-import * as schema from './schema.ts'
+import type * as schema from './schema.d.ts'
 
 export type Responses = Record<string, unknown | never | { content: Record<string, unknown> }>
 export type MapResponses<T extends Responses, R = T[keyof T]> = R[keyof R]

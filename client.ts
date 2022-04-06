@@ -1,4 +1,4 @@
-import { APIRoutes, ExtendedRequestInit, TypedResponse } from "./routes.ts";
+import type { APIRoutes, ExtendedRequestInit, TypedResponse } from "./routes.d.ts";
 
 export type RequestFn<Method extends APIRoutes["method"]> = <
   MethodRoutes extends APIRoutes & { method: Method },
@@ -49,7 +49,7 @@ export class APIClient {
     this.config.base ??= "";
   }
 
-  #fetch(path: string, init?: ExtendedRequestInit) {
+  _fetch(path: string, init?: ExtendedRequestInit) {
     return fetch(
       `${this.config.base}${path}?${
         init?.query && encodeURLQueryString(init.query)
@@ -76,21 +76,21 @@ export class APIClient {
       ? [name: Name, path: Path, init?: Init]
       : [name: Name, path: Path, init: Init]
   ): Promise<TypedResponse<Route["response"]>> {
-    return this.#fetch(path, init);
+    return this._fetch(path, init);
   }
 
   get: RequestFn<"get"> = (...[_name, path, init]) =>
-    this.#fetch(path, init).then((res) => res.json());
+    this._fetch(path, init).then((res) => res.json());
 
   post: RequestFn<"post"> = (...[_name, path, init]) =>
-    this.#fetch(path, init).then((res) => res.json());
+    this._fetch(path, init).then((res) => res.json());
 
   delete: RequestFn<"delete"> = (...[_name, path, init]) =>
-    this.#fetch(path, init).then((res) => res.json());
+    this._fetch(path, init).then((res) => res.json());
 
   put: RequestFn<"put"> = (...[_name, path, init]) =>
-    this.#fetch(path, init).then((res) => res.json());
+    this._fetch(path, init).then((res) => res.json());
 
   patch: RequestFn<"patch"> = (...[_name, path, init]) =>
-    this.#fetch(path, init).then((res) => res.json());
+    this._fetch(path, init).then((res) => res.json());
 }
