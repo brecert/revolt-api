@@ -18,3 +18,10 @@ console.log(`The API is running revolt ${config.revolt}`);
 
 const me = await api.get("Fetch Self", "/users/@me");
 console.log(`My ID is ${me._id}`);
+
+const channel_id = "01F9RHP3807TPS2E9RVN14YVTC";
+await api.post("Send Message", `/channels/${channel_id}/messages`, {
+  body: {
+    content: "Hello!",
+  },
+});

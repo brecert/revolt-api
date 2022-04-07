@@ -58,7 +58,9 @@ export const encodeURLQueryString = (
   params: Readonly<Query>,
 ) =>
   Object.keys(params)
-    .map((k) =>`${encodeURIComponent(k)}=${encodeURIComponent(params[k] ?? "null")}`)
+    .map((k) =>
+      `${encodeURIComponent(k)}=${encodeURIComponent(params[k] ?? "null")}`
+    )
     .join("&");
 
 /**

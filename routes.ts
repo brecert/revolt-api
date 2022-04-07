@@ -1,4 +1,4 @@
-// This file was generated with https://github.com/brecert/revolt-api-gen
+// This file was generated with https://github.com/brecert/revolt-api
 
 import type * as schema from './schema.ts'
 

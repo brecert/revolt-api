@@ -1,10 +1,11 @@
 # Revolt API
+
 > a typed revolt api client
 
 # Usage
 
 ```ts
-import * as Revolt from "https://deno.land/x/revolt_api/client.ts";
+import * as Revolt from "https://deno.land/x/revolt_api/mod.ts";
 
 const api = new Revolt.APIClient({
   base: "https://api.revolt.chat",
@@ -19,6 +20,13 @@ console.log(`The API is running revolt ${config.revolt}`);
 
 const me = await api.get("Fetch Self", "/users/@me");
 console.log(`My ID is ${me._id}`);
+
+const channel_id = "some channel id";
+await api.post("Send Message", `/channels/${channel_id}/messages`, {
+  body: {
+    content: "Hello!",
+  },
+});
 ```
 
 # Building and Updating
@@ -33,5 +41,10 @@ $ npx openapi-typescript OpenAPI.json -o schema.ts
 ✨ openapi-typescript 5.2.0
 🚀 OpenAPI.json -> /revolt-api/schema.ts [417ms]
 
-$ deno run -A ./scripts/generate.ts -i OpenAPI.json -o .\routes.ts
+$ deno run -A ./scripts/generate_routes.ts -i OpenAPI.json -o .\routes.ts
+
+$ deno run -A ./scripts/export_types.ts -i OpenAPI.json -o .\types.ts
+
+# build npm package
+$ deno run -A ./scripts/build_npm.ts
 ```

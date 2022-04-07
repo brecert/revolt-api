@@ -35,7 +35,7 @@ for (const [path, methods] of Object.entries(api.paths ?? {})) {
 
     const body = "requestBody" in route
       ? `schema.operations['${route.operationId}']['requestBody']['content']['application/json']`
-      : 'never';
+      : "never";
 
     routes.push(
       `  | { name: "${route.summary}", method: '${method}', path: \`${tsPath}\`, query: ${query}, body: ${body}, response: ${response} }`,
@@ -44,7 +44,7 @@ for (const [path, methods] of Object.entries(api.paths ?? {})) {
 }
 
 const output = `
-// This file was generated with https://github.com/brecert/revolt-api-gen
+// This file was generated with https://github.com/brecert/revolt-api
 
 import type * as schema from './schema.ts'
 
