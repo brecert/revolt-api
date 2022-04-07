@@ -53,13 +53,12 @@ export type FetchFn = <
   )
 ) => Promise<TypedResponse<Route["response"]>>;
 
+// faster and more extendable than `URLSearchParams`
 export const encodeURLQueryString = (
   params: Readonly<Query>,
 ) =>
   Object.keys(params)
-    .map((k) =>
-      `${encodeURIComponent(k)}=${encodeURIComponent(params[k] ?? "null")}`
-    )
+    .map((k) =>`${encodeURIComponent(k)}=${encodeURIComponent(params[k] ?? "null")}`)
     .join("&");
 
 /**
@@ -97,6 +96,9 @@ export class APIClient {
     this.config.base ??= "";
   }
 
+  /**
+   * Send an untyped arbitrary request.
+   */
   _fetch(path: string, init?: ExtendRequestInit) {
     return fetch(
       `${this.config.base}${path}?${
@@ -111,6 +113,10 @@ export class APIClient {
     );
   }
 
+  /**
+   * Send a typed arbitrary request.
+   * @returns Typed response data
+   */
   fetch<
     Name extends APIRoutes["name"],
     Routes extends APIRoutes & { name: Name },

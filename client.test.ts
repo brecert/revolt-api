@@ -1,9 +1,9 @@
 import * as Revolt from "./client.ts";
 
-const REVOLT_TOKEN = Deno.env.get('REVOLT_TOKEN')
-if(!REVOLT_TOKEN) throw new Error('REVOLT_TOKEN is required')
+const REVOLT_TOKEN = Deno.env.get("REVOLT_TOKEN");
+if (!REVOLT_TOKEN) throw new Error("REVOLT_TOKEN is required");
 
-console.log(REVOLT_TOKEN)
+console.log(REVOLT_TOKEN);
 
 const api = new Revolt.APIClient({
   base: "https://api.revolt.chat",

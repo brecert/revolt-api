@@ -4,12 +4,12 @@
 # Usage
 
 ```ts
-import * as Revolt from "./client.ts";
+import * as Revolt from "https://deno.land/x/revolt_api/client.ts";
 
 const api = new Revolt.APIClient({
   base: "https://api.revolt.chat",
   headers: {
-    "x-bot-token": TOKEN,
+    "x-bot-token": REVOLT_TOKEN,
     "content-type": "application/json",
   },
 });
