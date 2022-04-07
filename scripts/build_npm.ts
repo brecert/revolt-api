@@ -5,6 +5,7 @@ await emptyDir("./npm");
 await build({
   entryPoints: ["./client.ts"],
   outDir: "./npm",
+  test: false,
   shims: {},
   package: {
     // package.json properties

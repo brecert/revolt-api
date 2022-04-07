@@ -33,8 +33,12 @@ for (const [path, methods] of Object.entries(api.paths ?? {})) {
       ? `schema.operations['${route.operationId}']['parameters']['query']`
       : "never";
 
+    const body = "requestBody" in route
+      ? `schema.operations['${route.operationId}']['requestBody']['content']['application/json']`
+      : 'never';
+
     routes.push(
-      `  | { name: "${route.summary}", method: '${method}', path: \`${tsPath}\`, query: ${query}, response: ${response} }`,
+      `  | { name: "${route.summary}", method: '${method}', path: \`${tsPath}\`, query: ${query}, body: ${body}, response: ${response} }`,
     );
   }
 }
@@ -42,20 +46,17 @@ for (const [path, methods] of Object.entries(api.paths ?? {})) {
 const output = `
 // This file was generated with https://github.com/brecert/revolt-api-gen
 
-import type * as schema from './schema.d.ts'
+import type * as schema from './schema.ts'
 
 export type Responses = Record<string, unknown | never | { content: Record<string, unknown> }>
-export type MapResponses<T extends Responses, R = T[keyof T]> = R[keyof R]
+export type MapResponses<T extends Responses> = T extends { 200: infer Valid } ? Valid[keyof Valid] : unknown
 
-export interface TypedResponse<T extends Record<string, unknown> = Record<string, unknown>> extends Response {
-  json<P = T['application/json']>(): Promise<P>
+export interface TypedResponse<T extends Record<string, unknown> | unknown = Record<string, unknown>> extends Response {
+  json<P = T extends Record<string, unknown> ? T['application/json'] : unknown>(): Promise<P>
 }
 
-export interface ExtendedRequestInit extends RequestInit {
-  query: Record<string, string | number | boolean>
-}
-
-export type Route = { name: string, method: string, path: string, query: unknown, response: unknown }
+export type Query = Record<string, string | number | boolean | null>;
+export type Route = { name: string, method: string, path: string, query: Query, response: unknown }
 
 export type APIRoutes =
 ${routes.join("\n")}
