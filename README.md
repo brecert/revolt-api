@@ -1,6 +1,6 @@
 # Revolt API
 
-![revolt-api](https://img.shields.io/npm/v/@brecert/revolt-api) [![deno module](https://shield.deno.dev/x/revolt_api)](https://deno.land/x/revolt_api)
+[![revolt-api](https://img.shields.io/npm/v/@brecert/revolt-api)](https://www.npmjs.com/package/@brecert/revolt-api) [![deno module](https://shield.deno.dev/x/revolt_api)](https://deno.land/x/revolt_api)
 
 This package contains typings for objects in the [Revolt API](https://developers.revolt.chat/api/) and a fully typed API request builder.
 
