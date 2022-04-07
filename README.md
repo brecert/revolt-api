@@ -1,8 +1,12 @@
 # Revolt API
 
-> a typed revolt api client
+![revolt-api](https://img.shields.io/npm/v/@brecert/revolt-api) [![deno module](https://shield.deno.dev/x/revolt_api)](https://deno.land/x/revolt_api)
+
+This package contains typings for objects in the [Revolt API](https://developers.revolt.chat/api/) and a fully typed API request builder.
 
 # Usage
+
+You can find more info in the [documentation](https://doc.deno.land/https://deno.land/x/revolt_api@0.3.1/mod.ts).
 
 ```ts
 import * as Revolt from "https://deno.land/x/revolt_api/mod.ts";
