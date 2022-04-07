@@ -10,7 +10,11 @@ type ExistingKeys<T> = {
 
 type RequireNonNull<T> = Required<Pick<T, ExistingKeys<T>>>;
 
-/** @throws {Error} */
+/**
+ * Type used for {@link APIClient} `get`, `post`, and similar methods
+ * @throws {Error}
+ * @ignore
+ */
 export type RequestFn<
   Method extends APIRoutes["method"],
   Routes extends APIRoutes & { method: Method } = APIRoutes & {
@@ -32,6 +36,10 @@ export type RequestFn<
   )
 ) => Promise<Response>;
 
+/**
+ * Type used for {@link fetchAPI}
+ * @ignore
+ */
 export type FetchFn = <
   Name extends APIRoutes["name"],
   Route extends APIRoutes & { name: Name },
@@ -54,7 +62,7 @@ export type FetchFn = <
 ) => Promise<TypedResponse<Route["response"]>>;
 
 // faster and more extendable than `URLSearchParams`
-export const encodeURLQueryString = (
+const encodeURLQueryString = (
   params: Readonly<Query>,
 ) =>
   Object.keys(params)
@@ -88,11 +96,31 @@ const handleResponse = async (res: Response) => {
   return res.status === 200 ? res.json() : {};
 };
 
+/**
+ * Initialization parameters for {@link APIClient}
+ */
 export interface ClientInit
   extends Omit<RequestInit, "body" | "integrity" | "method" | "signal"> {
+  /** The base URL for all requests */
   base: string;
 }
 
+/**
+ * API Client
+ *
+ * @example
+ * ```ts
+ * const api = new Revolt.APIClient({
+ *   base: "https://api.revolt.chat",
+ *   headers: {
+ *     "x-bot-token": REVOLT_TOKEN,
+ *     "content-type": "application/json",
+ *   },
+ * });
+ *
+ * api.get("Query Node", "/").then(console.log);
+ * ```
+ */
 export class APIClient {
   constructor(public config: ClientInit) {
     this.config.base ??= "";
@@ -100,6 +128,7 @@ export class APIClient {
 
   /**
    * Send an untyped arbitrary request.
+   * Similar to a standard `fetch`.
    */
   _fetch(path: string, init?: ExtendRequestInit) {
     return fetch(
@@ -117,6 +146,13 @@ export class APIClient {
 
   /**
    * Send a typed arbitrary request.
+   *
+   * @example
+   * ```ts
+   * const config = await api.fetch('Query Node', '/').then(res => res.json());
+   * console.log(`The API is running revolt ${config.revolt}`);
+   * ```
+   *
    * @returns Typed response data
    */
   fetch<
@@ -135,18 +171,49 @@ export class APIClient {
     return this._fetch(path, init);
   }
 
+  /**
+   * Send HTTP GET request.
+   *
+   * @example
+   * ```ts
+   * const config = await api.get("Query Node", "/");
+   * console.log(`The API is running revolt ${config.revolt}`);
+   * ```
+   */
   get: RequestFn<"get"> = (...[_name, path, init]) =>
     this._fetch(path, { ...init, method: "GET" }).then(handleResponse);
 
+  /**
+   * Send HTTP POST request.
+   *
+   * @example
+   * ```ts
+   * const channel_id = "01F9RHP3807TPS2E9RVN14YVTC";
+   * await api.post("Send Message", `/channels/${channel_id}/messages`, {
+   *   body: {
+   *     content: "Hello!",
+   *   },
+   * });
+   * ```
+   */
   post: RequestFn<"post"> = (...[_name, path, init]) =>
     this._fetch(path, { ...init, method: "POST" }).then(handleResponse);
 
+  /**
+   * Send HTTP DELETE request.
+   * @example
+   * ```ts
+   * api.delete('Delete All Sessions', '/auth/session/all', { query: { revoke_self: false } })
+   * ```
+   */
   delete: RequestFn<"delete"> = (...[_name, path, init]) =>
     this._fetch(path, { ...init, method: "DELETE" }).then(handleResponse);
 
+  /** Send HTTP PUT request. */
   put: RequestFn<"put"> = (...[_name, path, init]) =>
     this._fetch(path, { ...init, method: "PUT" }).then(handleResponse);
 
+  /** Send HTTP PATCH request. */
   patch: RequestFn<"patch"> = (...[_name, path, init]) =>
     this._fetch(path, { ...init, method: "PATCH" }).then(handleResponse);
 }
