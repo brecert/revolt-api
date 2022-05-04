@@ -19,7 +19,7 @@ if (!inputPath || !outPath) {
 const api: OpenAPI3 = await Deno.readTextFile(inputPath).then(JSON.parse);
 
 const exports = Object.keys(api.components?.schemas ?? {})
-  .map((name) => `export type ${name} = schema.components['schemas']['${name}'];`)
+  .map((name) => `export type ${name.replaceAll(/\s/g, '_')} = schema.components['schemas']['${name}'];`)
   .join("\n");
 
 const output = `

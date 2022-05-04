@@ -363,7 +363,7 @@
           "Direct Messaging"
         ],
         "summary": "Open Direct Message",
-        "description": "Open a DM with another user.",
+        "description": "Open a DM with another user.\n\nIf the target is oneself, a saved messages channel is returned.",
         "operationId": "open_dm_req",
         "parameters": [
           {
@@ -2030,7 +2030,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Server"
+                  "$ref": "#/components/schemas/CreateServerResponse"
                 }
               }
             }
@@ -2295,6 +2295,16 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "exclude_offline",
+            "in": "query",
+            "description": "Whether to exclude offline users",
+            "schema": {
+              "description": "Whether to exclude offline users",
+              "type": "boolean",
+              "nullable": true
             }
           }
         ],
@@ -5881,8 +5891,7 @@
         "required": [
           "_id",
           "author",
-          "channel",
-          "content"
+          "channel"
         ],
         "properties": {
           "_id": {
@@ -5904,11 +5913,17 @@
           },
           "content": {
             "description": "Message content",
+            "type": "string",
+            "nullable": true
+          },
+          "system": {
+            "description": "System message",
             "allOf": [
               {
-                "$ref": "#/components/schemas/Content"
+                "$ref": "#/components/schemas/SystemMessage"
               }
-            ]
+            ],
+            "nullable": true
           },
           "attachments": {
             "description": "Array of attachments",
@@ -5922,7 +5937,7 @@
             "description": "Time at which this message was last edited",
             "allOf": [
               {
-                "$ref": "#/components/schemas/DateTimeContainer"
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
               }
             ],
             "nullable": true
@@ -5961,23 +5976,6 @@
             "nullable": true
           }
         }
-      },
-      "Content": {
-        "description": "Untagged enum representing message content",
-        "anyOf": [
-          {
-            "description": "Message contains text content",
-            "type": "string"
-          },
-          {
-            "description": "Message is a system event",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/SystemMessage"
-              }
-            ]
-          }
-        ]
       },
       "SystemMessage": {
         "description": "Representation of a system event message",
@@ -6176,18 +6174,10 @@
           }
         ]
       },
-      "DateTimeContainer": {
-        "description": "Container so we can apply this within Option<>s.",
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/DateTime"
-          }
-        ]
-      },
-      "DateTime": {
-        "description": "Local definition of DateTime from Bson",
-        "type": "integer",
-        "format": "int64"
+      "ISO8601 Timestamp": {
+        "description": "ISO8601 formatted timestamp",
+        "type": "string",
+        "example": "1970-01-01T00:00:00Z"
       },
       "Embed": {
         "oneOf": [
@@ -6553,9 +6543,6 @@
       },
       "DataMessageSend": {
         "type": "object",
-        "required": [
-          "content"
-        ],
         "properties": {
           "nonce": {
             "description": "Unique token to prevent duplicate message sending\n\n**This is deprecated and replaced by `Idempotency-Key`!**",
@@ -6566,7 +6553,8 @@
             "description": "Message content to send",
             "type": "string",
             "maxLength": 2000,
-            "minLength": 0
+            "minLength": 0,
+            "nullable": true
           },
           "attachments": {
             "description": "Attachments to include in message",
@@ -6995,6 +6983,31 @@
             }
           }
         ]
+      },
+      "CreateServerResponse": {
+        "title": "Create Server Response",
+        "type": "object",
+        "required": [
+          "channels",
+          "server"
+        ],
+        "properties": {
+          "server": {
+            "description": "Server object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Server"
+              }
+            ]
+          },
+          "channels": {
+            "description": "Default channels",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Channel"
+            }
+          }
+        }
       },
       "Server": {
         "description": "Representation of a server on Revolt",
@@ -7602,6 +7615,7 @@
             "required": [
               "channel_id",
               "channel_name",
+              "code",
               "member_count",
               "server_id",
               "server_name",
@@ -7614,6 +7628,10 @@
                 "enum": [
                   "Server"
                 ]
+              },
+              "code": {
+                "description": "Invite code",
+                "type": "string"
               },
               "server_id": {
                 "description": "Id of the server",
@@ -7680,6 +7698,7 @@
             "required": [
               "channel_id",
               "channel_name",
+              "code",
               "type",
               "user_name"
             ],
@@ -7689,6 +7708,10 @@
                 "enum": [
                   "Group"
                 ]
+              },
+              "code": {
+                "description": "Invite code",
+                "type": "string"
               },
               "channel_id": {
                 "description": "Id of group channel",
@@ -7726,7 +7749,7 @@
           {
             "type": "object",
             "required": [
-              "channel",
+              "channels",
               "server",
               "type"
             ],
@@ -7737,13 +7760,12 @@
                   "Server"
                 ]
               },
-              "channel": {
-                "description": "Channel we are joining",
-                "allOf": [
-                  {
-                    "$ref": "#/components/schemas/Channel"
-                  }
-                ]
+              "channels": {
+                "description": "Channels in the server",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Channel"
+                }
               },
               "server": {
                 "description": "Server we are joining",

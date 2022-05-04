@@ -39,7 +39,11 @@ export interface paths {
     get: operations["fetch_dms_req"];
   };
   "/users/{target}/dm": {
-    /** Open a DM with another user. */
+    /**
+     * Open a DM with another user.
+     *
+     * If the target is oneself, a saved messages channel is returned.
+     */
     get: operations["open_dm_req"];
   };
   "/users/{target}/mutual": {
@@ -1023,11 +1027,13 @@ export interface components {
       /** @description Id of the user that sent this message */
       author: string;
       /** @description Message content */
-      content: components["schemas"]["Content"];
+      content?: string | null;
+      /** @description System message */
+      system?: components["schemas"]["SystemMessage"] | null;
       /** @description Array of attachments */
       attachments?: components["schemas"]["File"][] | null;
       /** @description Time at which this message was last edited */
-      edited?: components["schemas"]["DateTimeContainer"] | null;
+      edited?: components["schemas"]["ISO8601 Timestamp"] | null;
       /** @description Attached embeds to this message */
       embeds?: components["schemas"]["Embed"][] | null;
       /** @description Array of user ids mentioned in this message */
@@ -1037,8 +1043,6 @@ export interface components {
       /** @description Name and / or avatar overrides for this message */
       masquerade?: components["schemas"]["Masquerade"] | null;
     };
-    /** @description Untagged enum representing message content */
-    Content: Partial<string> & Partial<components["schemas"]["SystemMessage"]>;
     /** @description Representation of a system event message */
     SystemMessage:
       | {
@@ -1094,13 +1098,11 @@ export interface components {
           type: "channel_icon_changed";
           by: string;
         };
-    /** @description Container so we can apply this within Option<>s. */
-    DateTimeContainer: components["schemas"]["DateTime"];
     /**
-     * Format: int64
-     * @description Local definition of DateTime from Bson
+     * @description ISO8601 formatted timestamp
+     * @example 1970-01-01T00:00:00Z
      */
-    DateTime: number;
+    "ISO8601 Timestamp": string;
     Embed:
       | {
           /** @enum {string} */
@@ -1208,7 +1210,7 @@ export interface components {
        */
       nonce?: string | null;
       /** @description Message content to send */
-      content: string;
+      content?: string | null;
       /** @description Attachments to include in message */
       attachments?: string[] | null;
       /** @description Messages to reply to */
@@ -1368,6 +1370,13 @@ export interface components {
         /** @description Allow / deny values to set for members in this `TextChannel` or `VoiceChannel` */
         permissions: components["schemas"]["Override"];
       }>;
+    /** Create Server Response */
+    CreateServerResponse: {
+      /** @description Server object */
+      server: components["schemas"]["Server"];
+      /** @description Default channels */
+      channels: components["schemas"]["Channel"][];
+    };
     /** @description Representation of a server on Revolt */
     Server: {
       /** @description Unique Id */
@@ -1604,6 +1613,8 @@ export interface components {
       | {
           /** @enum {string} */
           type: "Server";
+          /** @description Invite code */
+          code: string;
           /** @description Id of the server */
           server_id: string;
           /** @description Name of the server */
@@ -1631,6 +1642,8 @@ export interface components {
       | {
           /** @enum {string} */
           type: "Group";
+          /** @description Invite code */
+          code: string;
           /** @description Id of group channel */
           channel_id: string;
           /** @description Name of group channel */
@@ -1646,8 +1659,8 @@ export interface components {
     InviteJoinResponse: {
       /** @enum {string} */
       type: "Server";
-      /** @description Channel we are joining */
-      channel: components["schemas"]["Channel"];
+      /** @description Channels in the server */
+      channels: components["schemas"]["Channel"][];
       /** @description Server we are joining */
       server: components["schemas"]["Server"];
     };
@@ -1942,7 +1955,11 @@ export interface operations {
       };
     };
   };
-  /** Open a DM with another user. */
+  /**
+   * Open a DM with another user.
+   *
+   * If the target is oneself, a saved messages channel is returned.
+   */
   open_dm_req: {
     parameters: {
       path: {
@@ -2677,7 +2694,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          "application/json": components["schemas"]["Server"];
+          "application/json": components["schemas"]["CreateServerResponse"];
         };
       };
       /** An error occurred. */
@@ -2807,6 +2824,10 @@ export interface operations {
     parameters: {
       path: {
         target: components["schemas"]["Id"];
+      };
+      query: {
+        /** Whether to exclude offline users */
+        exclude_offline?: boolean | null;
       };
     };
     responses: {
